@@ -45,3 +45,15 @@ code {
   position: absolute;
   bottom: 105px;
 }
+.invoice-details-wrapper {
+  width: 55vw;
+  position: relative;
+  left: 20%;
+  top: 10%;
+}
+.ant-table-wrapper {
+  width: 90%;
+  /* margin: 20px 10px 10px 10px; */
+  position: relative;
+  left: 5%;
+}

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Layout, Avatar, Divider } from 'antd';
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import ImgAvatar from '../../assets/image-avatar.jpg';
@@ -18,13 +18,15 @@ const LayoutComponent: React.FC<any> = () => {
 
   const handleToggleTheme = () => {
     if (themeContext.themeMode === 'light') {
-      themeContext.themeMode = 'dark';
       setSelectedTheme('dark');
     } else {
-      themeContext.themeMode = 'light';
       setSelectedTheme('light');
     }
   };
+
+  useEffect(() => {
+    themeContext.themeMode = selectedTheme;
+  }, [selectedTheme]);
 
   return (
     <Section>
