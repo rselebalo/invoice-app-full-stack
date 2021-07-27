@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Table, Space, Typography, Badge } from 'antd';
+import { Space, Typography, Badge } from 'antd';
 import Button2 from '../../components/Buttons/default2';
 import Button5 from '../../components/Buttons/default5';
 import Button3 from '../../components/Buttons/default3';
-import data from '../../utils/data.json';
 import Container from '../../components/Container';
 import Card from '../../components/Card';
 import ArrowLeft from '../../assets/icon-arrow-left.svg';
@@ -13,6 +12,7 @@ import InvoiceLineItem from '../../components/InvoiceLineItem';
 import LineItemStatus from '../../components/InvoiceLineItem/status';
 import InformationPiece from '../../components/Card/containter';
 import { ThemeContext } from '../../contexts';
+import StyledTable from '../../components/Table';
 
 const Invoice: React.FC<any> = ({ ...props }) => {
   const { Text, Title } = Typography;
@@ -51,7 +51,9 @@ const Invoice: React.FC<any> = ({ ...props }) => {
     <>
       <InvoiceLineItem key={nanoid()}>
         <Space>
-          <Title level={5}>Status</Title>
+          <Title level={5} style={{ paddingTop: 5 }}>
+            Status
+          </Title>
           <LineItemStatus status={invoice?.status || 'draft'}>
             <Badge
               status={invoice?.status === 'paid' ? 'success' : invoice?.status === 'pending' ? 'warning' : 'error'}
@@ -61,9 +63,11 @@ const Invoice: React.FC<any> = ({ ...props }) => {
         </Space>
 
         <Container>
-          <Button3 title="Edit" />;
-          <Button5 title="Delete" />;
-          <Button2 title="Mark as Paid" />
+          <Space>
+            <Button3 title="Edit" />
+            <Button5 title="Delete" />
+            <Button2 title="Mark as Paid" />
+          </Space>
         </Container>
       </InvoiceLineItem>
 
@@ -73,7 +77,7 @@ const Invoice: React.FC<any> = ({ ...props }) => {
             <Title level={5}>#{invoice?.id}</Title>
             <Text>{invoice?.description}</Text>
           </div>
-          <div className="">
+          <div>
             <Text>{invoice?.senderAddress.street}</Text>
             <br />
             <Text>{invoice?.senderAddress.city}</Text>
@@ -92,6 +96,7 @@ const Invoice: React.FC<any> = ({ ...props }) => {
             <Text>Payment Due</Text>
             <Title level={5}>{invoice?.paymentDue}</Title>
           </div>
+
           <div>
             <Text>Bill To</Text>
             <Title level={5}>{invoice?.clientName}</Title>
@@ -110,8 +115,9 @@ const Invoice: React.FC<any> = ({ ...props }) => {
             <Title level={5}>{invoice?.clientEmail}</Title>
           </div>
         </InformationPiece>
+
         <InformationPiece>
-          <Table columns={columns} dataSource={invoice?.items} size="middle" pagination={false} footer={footer} />
+          <StyledTable columns={columns} dataSource={invoice?.items} size="middle" pagination={false} footer={footer} />
         </InformationPiece>
       </Card>
     </>

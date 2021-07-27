@@ -66,6 +66,14 @@ export const lightTheme = {
     background: 'hsl(231, 73%, 93%)',
     color: '#eff2f5',
   },
+  sider: {
+    background: 'hsl(233, 30%, 21%)',
+    color: '#eff2f5',
+  },
+  drawer: {
+    background: 'hsl(240, 27%, 98%)',
+    color: '#eff2f5',
+  },
   invoiceLineItem: {
     background: 'hsl(231, 73%, 93%)',
     color: '#eff2f5',
@@ -138,6 +146,14 @@ export const darkTheme = {
   },
   card: {
     background: 'hsl(233, 30%, 17%)',
+    color: '#eff2f5',
+  },
+  sider: {
+    background: 'hsl(233, 30%, 21%)',
+    color: '#eff2f5',
+  },
+  drawer: {
+    background: 'hsl(233, 30%, 21%)',
     color: '#eff2f5',
   },
   invoiceLineItem: {

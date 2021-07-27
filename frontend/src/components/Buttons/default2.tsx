@@ -4,7 +4,7 @@ import Plus from '../../assets/icon-plus.svg';
 
 const Button = styled.div`
   width: 140px;
-  height: 45px;
+  height: 40px;
   text-align: center;
   border-radius: 24px;
   font-weight: 700;

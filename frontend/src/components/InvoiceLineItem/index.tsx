@@ -4,7 +4,7 @@ const LineItem = styled.div`
   height: 65px;
   color: ${(props) => props.theme.invoiceLineItem.color};
   background-color: ${(props) => props.theme.invoiceLineItem.background};
-  margin: 15px;
+  margin: 15px 0;
   display: flex;
   justify-content: space-between;
   align-items: center;

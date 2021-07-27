@@ -29,9 +29,15 @@ const Button = styled.div`
   }
 `;
 
-const DefaultButton = ({ title }: { title: string }) => {
+const DefaultButton = ({
+  title,
+  onClick,
+}: {
+  title: string;
+  onClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
+}) => {
   return (
-    <Button>
+    <Button onClick={onClick}>
       <div>
         <img src={Plus} />
       </div>

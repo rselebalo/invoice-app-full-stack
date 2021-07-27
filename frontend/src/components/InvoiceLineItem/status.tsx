@@ -5,8 +5,8 @@ export interface InvoiceStatusProps {
   theme: any;
 }
 
-const LineItemStatus = styled.span<InvoiceStatusProps>`
-  height: 46px;
+const LineItemStatus = styled.div<InvoiceStatusProps>`
+  height: 40px;
   width: 120px;
   text-align: center;
   padding-top: 11px;

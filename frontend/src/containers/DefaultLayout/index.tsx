@@ -9,8 +9,7 @@ import { ROUTES } from '../../navigation/routes';
 import { ThemeContext } from '../../contexts';
 import Main from '../../components/Main';
 import Section from '../../components/Section';
-
-const { Sider } = Layout;
+import StyledSider from '../../components/Sider';
 
 const LayoutComponent: React.FC<any> = () => {
   const themeContext = useContext(ThemeContext);
@@ -30,7 +29,7 @@ const LayoutComponent: React.FC<any> = () => {
 
   return (
     <Section>
-      <Sider width={90} className="layout-sider">
+      <StyledSider width={90} className="layout-sider">
         <div className="logo">
           <img alt="logo" src={Logo} />
         </div>
@@ -43,7 +42,7 @@ const LayoutComponent: React.FC<any> = () => {
         <div className="avatar-container">
           <Avatar size={45} icon={<img alt="logo" src={ImgAvatar} />} />
         </div>
-      </Sider>
+      </StyledSider>
 
       <Layout className="site-layout">
         <Main>

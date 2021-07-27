@@ -12,16 +12,6 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.layout-sider {
-  background: hsl(233, 30%, 21%);
-  border-radius: 0 6px 6px;
-}
-.ant-layout-sider-children {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-}
 .sider-divider {
   background: hsl(233, 37%, 63%);
   position: absolute;
@@ -44,16 +34,4 @@ code {
 .theme-selector {
   position: absolute;
   bottom: 105px;
-}
-.invoice-details-wrapper {
-  width: 55vw;
-  position: relative;
-  left: 20%;
-  top: 10%;
-}
-.ant-table-wrapper {
-  width: 90%;
-  /* margin: 20px 10px 10px 10px; */
-  position: relative;
-  left: 5%;
 }
