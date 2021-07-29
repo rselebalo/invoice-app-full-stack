@@ -1,8 +1,9 @@
+import { Button } from 'antd';
 import React from 'react';
 import styled from 'styled-components';
 import Plus from '../../assets/icon-plus.svg';
 
-const Button = styled.div`
+const StyledButton = styled(Button)`
   width: 180px;
   height: 45px;
   display: flex;
@@ -13,6 +14,10 @@ const Button = styled.div`
   font-weight: 700;
   padding: 10px 30px 10px 10px;
 
+  :hover {
+    color: ${(props) => props.theme.button1.default.color};
+    background-color: ${(props) => props.theme.button1.default.background};
+  }
   color: ${(props) => props.theme.button1.default.color};
   background-color: ${(props) => props.theme.button1.default.background};
   div {
@@ -34,15 +39,15 @@ const DefaultButton = ({
   onClick,
 }: {
   title: string;
-  onClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
+  onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
 }) => {
   return (
-    <Button onClick={onClick}>
+    <StyledButton onClick={onClick}>
       <div>
         <img src={Plus} />
       </div>
       {title}
-    </Button>
+    </StyledButton>
   );
 };
 export default DefaultButton;

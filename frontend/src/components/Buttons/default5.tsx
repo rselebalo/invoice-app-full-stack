@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Plus from '../../assets/icon-plus.svg';
+import { Button } from 'antd';
 
-const Button = styled.div`
+const StyledButton = styled(Button)`
   width: 110px;
   height: 40px;
   text-align: center;
@@ -10,6 +10,10 @@ const Button = styled.div`
   font-weight: 700;
   padding: 10px;
 
+  :hover {
+    color: ${(props) => props.theme.button1.default.color};
+    background-color: ${(props) => props.theme.button1.default.background};
+  }
   color: ${(props) => props.theme.button5.default.color};
   background-color: ${(props) => props.theme.button5.default.background};
   div {
@@ -27,6 +31,6 @@ const Button = styled.div`
 `;
 
 const DefaultButton = ({ title }: { title: string }) => {
-  return <Button>{title}</Button>;
+  return <StyledButton>{title}</StyledButton>;
 };
 export default DefaultButton;

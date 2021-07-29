@@ -16,8 +16,8 @@ import StyledTable from '../../components/Table';
 
 const Invoice: React.FC<any> = ({ ...props }) => {
   const { Text, Title } = Typography;
-  const themeContext = useContext(ThemeContext);
-  const [selectedTheme, setSelectedTheme] = useState(themeContext.themeMode);
+  //const themeContext = useContext(ThemeContext);
+  //const [selectedTheme, setSelectedTheme] = useState(themeContext.themeMode);
   const [invoice, setInvoice] = useState<IInvoice>(props.selected);
   const footer = () => (
     <Container>
@@ -43,9 +43,9 @@ const Invoice: React.FC<any> = ({ ...props }) => {
     },
   ];
 
-  useEffect(() => {
-    setSelectedTheme(themeContext.themeMode);
-  }, [themeContext.themeMode]);
+  // useEffect(() => {
+  //   setSelectedTheme(themeContext.themeMode);
+  // }, [themeContext.themeMode]);
 
   return (
     <>
