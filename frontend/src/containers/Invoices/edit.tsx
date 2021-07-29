@@ -139,7 +139,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
 
         <>
           <StyledLabel>Bill To</StyledLabel>
-          <Form.Item>
+          <Form.Item required name="clientName">
             <label>{"Client's Name"}</label>
             <Input
               size="large"
@@ -150,6 +150,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
             />
           </Form.Item>
           <Form.Item
+            name="clientEmail"
             rules={[
               {
                 type: 'email',
@@ -171,18 +172,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
             />
           </Form.Item>
 
-          <Form.Item
-            rules={[
-              {
-                type: 'email',
-                message: 'The input is not valid E-mail!',
-              },
-              {
-                required: true,
-                message: 'Please input your E-mail!',
-              },
-            ]}
-          >
+          <Form.Item required name="clientAddress-street">
             <label>Street Address</label>
             <Input
               size="large"
@@ -194,7 +184,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
           </Form.Item>
           <Container>
             <Space>
-              <Form.Item required tooltip="This is a required field">
+              <Form.Item required tooltip="This is a required field" name="clientAddress-city">
                 <label>City</label>
                 <Input
                   name="clientAddress-city"
@@ -204,7 +194,13 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onChangeAdress}
                 />
               </Form.Item>
-              <Form.Item required tooltip="This is a required field">
+              <Form.Item
+                required
+                tooltip="This is a required field"
+                name="clientAddress-postCode"
+                validateStatus="error"
+                help="Should be combination of numbers & alphabets"
+              >
                 <label>Postal Code</label>
                 <Input
                   name="clientAddress-postCode"
@@ -214,7 +210,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onChangeAdress}
                 />
               </Form.Item>
-              <Form.Item required tooltip="This is a required field">
+              <Form.Item required tooltip="This is a required field" name="clientAddress-country">
                 <label>Country</label>
                 <Input
                   name="clientAddress-country"
@@ -230,17 +226,16 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
           <br />
           <Container>
             <Space>
-              <Form.Item required tooltip="This is a required field">
+              <Form.Item required tooltip="This is a required field" name="createdAt">
                 <label>Invoice Date</label>
                 <DatePicker
                   size="large"
                   placeholder="Select date"
                   value={invoice ? new Date(invoice?.createdAt) : new Date()}
-                  name="createdAt"
                   onChange={onDateChange}
                 />
               </Form.Item>
-              <Form.Item required tooltip="This is a required field">
+              <Form.Item required tooltip="This is a required field" name="paymentTerms">
                 <label>Payment Terms</label>
                 <Select
                   size="large"
@@ -257,9 +252,9 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
               </Form.Item>
             </Space>
           </Container>
-          <Form.Item required tooltip="This is a required field">
+          <Form.Item required tooltip="This is a required field" name="description">
             <label>Project Description</label>
-            <Input size="large" placeholder="Enter description" value={invoice?.description} />
+            <Input size="large" placeholder="Enter description" name="description" value={invoice?.description} />
           </Form.Item>
 
           <>
@@ -275,8 +270,8 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                       <Form.Item
                         required
                         tooltip="This is a required field"
-                        //name={[field.name, 'field']}
-                        fieldKey={[field.fieldKey, 'name']}
+                        name="item-name"
+                        fieldKey="item-name"
                         shouldUpdate={() => true}
                       >
                         <label>Item Name</label>
@@ -285,8 +280,10 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                       <Form.Item
                         required
                         tooltip="This is a required field"
-                        //name={[field.name, 'quantity']}
-                        fieldKey={[field.fieldKey, 'quantity']}
+                        // name={[field.name, 'quantity']}
+                        // fieldKey={[field.fieldKey, 'quantity']}
+                        name="item-quantity"
+                        fieldKey="item-name"
                         shouldUpdate={() => true}
                       >
                         <label>Qty.</label>
@@ -295,8 +292,10 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                       <Form.Item
                         required
                         tooltip="This is a required field"
-                        //name={[field.name, 'price']}
-                        fieldKey={[field.fieldKey, 'price']}
+                        // name={[field.name, 'price']}
+                        // fieldKey={[field.fieldKey, 'price']}
+                        name="item-price"
+                        fieldKey="item-price"
                         shouldUpdate={() => true}
                       >
                         <label>Price</label>
@@ -306,7 +305,9 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                         required
                         tooltip="This is a required field"
                         //name={[field.name, 'total']}
-                        fieldKey={[field.fieldKey, 'total']}
+                        //fieldKey={[field.fieldKey, 'total']}
+                        name="item-total"
+                        fieldKey="item-total"
                         shouldUpdate={() => true}
                       >
                         <label>Total</label>

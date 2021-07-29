@@ -7,7 +7,7 @@ export interface IInvoice extends Document {
   description: string;
   paymentTerms: number;
   clientName: string;
-  clientEmail: string;
+  clientEmail?: string;
   status: string;
   senderAddress: {
     street: string;
@@ -16,10 +16,10 @@ export interface IInvoice extends Document {
     country: string;
   };
   clientAddress: {
-    street: string;
-    city: string;
-    postCode: string;
-    country: string;
+    street?: string;
+    city?: string;
+    postCode?: string;
+    country?: string;
   };
   items: {
     name: string;

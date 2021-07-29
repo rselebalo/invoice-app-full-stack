@@ -67,7 +67,6 @@ const generateInvoiceId = async() => {
         
         // generate 4 random numbers
         const randomNumbers = `${Math.floor(Math.random() * 9000 + 1)}`;
-        console.log(randomNumbers);
 
         let id = `${randomCharacters}${randomNumbers}`;
 

@@ -1,5 +1,6 @@
 import express from 'express';
 import { ERROR_MESSAGE } from '../constants';
+import { IInvoice } from '../interfaces';
 import { getInvoices, getInvoice, setInvoice } from '../services/invoice.service';
 
 export const invoices = async (
@@ -19,12 +20,12 @@ export const invoice = async (
     res: express.Response,
 ) => {
     try {
-        //@ts-ignore
-        const id = JSON.parse(req.query.id);
+        const id = req.params.id;
 
-        const resp = await getInvoice(id);
+        const resp = await getInvoice(id ||'');
         res.status(200).json(resp);
     } catch (error) {
+        console.log(error);
         res.status(500).json(ERROR_MESSAGE);
     }
 };
@@ -35,8 +36,8 @@ export const saveInvoice = async (
 ) => {
     try {
         //@ts-ignore
-        const invoice = JSON.parse(req.query);
-
+        const invoice = req.body;
+        
         const resp = await setInvoice(invoice);
         res.status(200).json(resp);
     } catch (error) {

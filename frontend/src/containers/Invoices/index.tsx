@@ -1,14 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { List, Space, Typography, Badge, Drawer, Menu } from 'antd';
 import Button from '../../components/Buttons/default1';
-import data from '../../utils/data.json';
 import Container from '../../components/Container';
 import ArrowDown from '../../assets/icon-arrow-down.svg';
 import ArrowRight from '../../assets/icon-arrow-right.svg';
 import ArrowLeft from '../../assets/icon-arrow-left.svg';
 import { IInvoice } from '../../interfaces';
 import { nanoid } from 'nanoid';
-import { isEmpty } from 'lodash';
 import InvoiceLineItem from '../../components/InvoiceLineItem';
 import LineItemStatus from '../../components/InvoiceLineItem/status';
 import Invoice from './invoice';
@@ -16,16 +14,18 @@ import { ThemeContext } from 'styled-components';
 import EditInvoice from './edit';
 import StyledDrawer from '../../components/Drawer';
 import InvoiceWrapper from '../../components/InvoiceWrapper';
+import { getInvoices } from '../../utils/funtions/getInvoices';
 
 const Invoices: React.FC<any> = () => {
   const [showDetail, setShowDetail] = useState(false);
   const themeContext = useContext(ThemeContext);
   const [selectedTheme, setSelectedTheme] = useState(themeContext.themeMode);
   const [editInvoice, setEditInvoice] = useState(false);
+  const [invoiceData, setInvoiceData] = useState<IInvoice[]>([]);
   const [selectedInvoice, setSelectedInvoice] = useState<IInvoice>();
   const { Text, Title } = Typography;
   const { SubMenu } = Menu;
-  const header = [{ title: 'Invoices', description: `There are ${data.length} total invoices` }];
+  const header = [{ title: 'Invoices', description: `There are ${invoiceData.length} total invoices` }];
 
   const handleShowDetails = (invoice: IInvoice) => {
     setShowDetail(true);
@@ -45,6 +45,11 @@ const Invoices: React.FC<any> = () => {
   useEffect(() => {
     setSelectedTheme(themeContext.themeMode);
   }, [themeContext.themeMode]);
+
+  useEffect(() => {
+    console.log(process.env);
+    getInvoices().then((result) => setInvoiceData(result));
+  }, []);
 
   return (
     <>
@@ -79,13 +84,16 @@ const Invoices: React.FC<any> = () => {
                   </Container>
                 }
               >
-                <List.Item.Meta title={<Text>Invoices</Text>} description={`There are ${data.length} total invoices`} />
+                <List.Item.Meta
+                  title={<Text>Invoices</Text>}
+                  description={`There are ${invoiceData.length} total invoices`}
+                />
               </List.Item>
             )}
           />
 
           <div>
-            {data.map((invoice: IInvoice) => (
+            {invoiceData.map((invoice: IInvoice) => (
               <InvoiceLineItem key={nanoid()}>
                 <Text>#{invoice.id}</Text>
                 <Text>Due {invoice.paymentDue}</Text>
