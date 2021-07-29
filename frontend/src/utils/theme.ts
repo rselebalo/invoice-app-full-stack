@@ -74,6 +74,10 @@ export const lightTheme = {
     background: 'hsl(240, 27%, 98%)',
     color: '#eff2f5',
   },
+  input: {
+    background: 'hsl(240, 27%, 98%)',
+    color: '#eff2f5',
+  },
   invoiceLineItem: {
     background: 'hsl(231, 73%, 93%)',
     color: '#eff2f5',
@@ -84,6 +88,10 @@ export const lightTheme = {
 export const darkTheme = {
   body: '#1E2139',
   text: '#F8F8FB',
+  scroll: {
+    width: '2px',
+    background: '',
+  },
   button1: {
     default: {
       background: 'hsl(252, 94%, 67%)',
@@ -155,6 +163,11 @@ export const darkTheme = {
   drawer: {
     background: 'hsl(233, 30%, 21%)',
     color: '#eff2f5',
+  },
+  input: {
+    background: '#252946',
+    color: '#eff2f5',
+    border: '1px solid #252946',
   },
   invoiceLineItem: {
     background: 'hsl(233, 30%, 21%)',

@@ -64,7 +64,7 @@ const Invoice: React.FC<any> = ({ ...props }) => {
 
         <Container>
           <Space>
-            <Button3 title="Edit" />
+            <Button3 title="Edit" onClick={() => props.onOpenDrawer(invoice)} />
             <Button5 title="Delete" />
             <Button2 title="Mark as Paid" />
           </Space>

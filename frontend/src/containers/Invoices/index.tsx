@@ -49,7 +49,7 @@ const Invoices: React.FC<any> = () => {
   return (
     <>
       <StyledDrawer
-        title={isEmpty(selectedInvoice) ? `Create Invoice` : `Edit #${selectedInvoice?.id}`}
+        //title={isEmpty(selectedInvoice) ? `Create Invoice` : `Edit #${selectedInvoice?.id}`}
         placement="left"
         closable={false}
         onClose={onCloseDrawer}
@@ -57,7 +57,7 @@ const Invoices: React.FC<any> = () => {
         getContainer={false}
         style={{ position: 'absolute' }}
       >
-        <EditInvoice />
+        <EditInvoice selectedInvoice={selectedInvoice} onCloseDrawer={onCloseDrawer} />
       </StyledDrawer>
 
       {!showDetail && (
@@ -119,7 +119,7 @@ const Invoices: React.FC<any> = () => {
               <img src={ArrowLeft} /> <Text> Go Back</Text>
             </Space>
           </div>
-          <Invoice selected={selectedInvoice} />
+          <Invoice selected={selectedInvoice} onOpenDrawer={onOpenDrawer} onCloseDrawer={onCloseDrawer} />
         </InvoiceWrapper>
       )}
     </>

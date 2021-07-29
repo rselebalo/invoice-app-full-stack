@@ -26,7 +26,13 @@ const Button = styled.div`
   }
 `;
 
-const DefaultButton = ({ title }: { title: string }) => {
-  return <Button>{title}</Button>;
+const DefaultButton = ({
+  title,
+  onClick,
+}: {
+  title: string;
+  onClick?: React.MouseEventHandler<HTMLDivElement> | undefined;
+}) => {
+  return <Button onClick={onClick}>{title}</Button>;
 };
 export default DefaultButton;

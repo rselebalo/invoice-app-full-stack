@@ -5,7 +5,9 @@ const StyledDrawer = styled(Drawer)`
   &.ant-drawer-left.ant-drawer-open .ant-drawer-content-wrapper {
     width: 40vw !important;
     left: 90px;
-    overflow-y: auto;
+    :-webkit-scrollbar {
+      ${(props) => props.theme.scroll}
+    }
   }
   &.ant-drawer .ant-drawer-content {
     border-radius: 0 6px 6px;
