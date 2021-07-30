@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Space, Typography, Badge, notification } from 'antd';
+import { Space, Typography, Badge } from 'antd';
 import localForage from 'localforage';
 import Button2 from '../../components/Buttons/default2';
 import Button5 from '../../components/Buttons/default5';
@@ -19,11 +19,11 @@ import ArrowLeft from '../../assets/icon-arrow-left.svg';
 import { saveInvoice } from '../../utils/funtions/saveInvoice';
 import StyledDrawer from '../../components/Drawer';
 import EditInvoice from './edit';
+import { openNotificationWithIcon } from '../../utils/funtions/notification';
 
 const Invoice: React.FC<any> = ({ ...props }) => {
   const { Text, Title } = Typography;
   const [invoice, setInvoice] = useState<IInvoice>();
-  const [mounted, setMounted] = useState(false);
   const [editInvoice, setEditInvoice] = useState(false);
 
   const footer = () => (
@@ -36,18 +36,22 @@ const Invoice: React.FC<any> = ({ ...props }) => {
     {
       title: 'Item Name',
       dataIndex: 'name',
+      key: 'name',
     },
     {
       title: 'Quantity',
       dataIndex: 'quantity',
+      key: 'quantity',
     },
     {
       title: 'Price',
       dataIndex: 'price',
+      key: 'price',
     },
     {
       title: 'Total',
       dataIndex: 'total',
+      key: 'total',
     },
   ];
 
@@ -63,30 +67,25 @@ const Invoice: React.FC<any> = ({ ...props }) => {
   };
 
   const onMarkAsPaid = async () => {
-    const selectedInvoice = await localForage.getItem(DRAFT_INVOICE_KEY);
+    const _selectedInvoice = { ...invoice, status: 'paid' };
     //@ts-ignore
-    const result = await saveInvoice({ ...selectedInvoice, status: 'paid' });
+    const result = await saveInvoice(_selectedInvoice);
+
+    await localForage.setItem(DRAFT_INVOICE_KEY, _selectedInvoice);
+    //@ts-ignore
+    setInvoice(_selectedInvoice);
 
     if (result === 'success') {
-      openNotificationWithIcon('Invoice succesfully updated!!');
+      openNotificationWithIcon({ type: 'success', description: 'Invoice succesfully updated!!', message: 'Success' });
     }
 
     await localForage.removeItem(DRAFT_INVOICE_KEY);
   };
 
-  const openNotificationWithIcon = (message: string) => {
-    notification['success']({
-      message: 'Success',
-      description: message,
-    });
-  };
-
   useEffect(() => {
-    console.log(props);
     localforage.getItem(DRAFT_INVOICE_KEY).then((result: any) => {
       setInvoice(result);
     });
-    setMounted(true);
   }, []);
 
   return (
@@ -99,7 +98,7 @@ const Invoice: React.FC<any> = ({ ...props }) => {
         getContainer={false}
         style={{ position: 'absolute' }}
       >
-        <EditInvoice onCloseDrawer={onCloseDrawer} />
+        <EditInvoice key={invoice?.id} onCloseDrawer={onCloseDrawer} />
       </StyledDrawer>
 
       <InvoiceWrapper>
@@ -180,6 +179,7 @@ const Invoice: React.FC<any> = ({ ...props }) => {
             <StyledTable
               columns={columns}
               dataSource={invoice?.items}
+              key={invoice?.id}
               size="middle"
               pagination={false}
               footer={footer}

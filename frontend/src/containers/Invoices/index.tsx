@@ -17,6 +17,7 @@ import { isEmpty } from 'lodash';
 import EmptyState from '../../components/EmptyState';
 import { getInvoicesByStatus } from '../../utils/funtions/getInvoicesByStatus';
 import { DEFAULT_INVOICE, DRAFT_INVOICE_KEY } from '../../constants';
+import localforage from 'localforage';
 
 const Invoices: React.FC<any> = () => {
   const themeContext = useContext(ThemeContext);
@@ -27,26 +28,41 @@ const Invoices: React.FC<any> = () => {
   const { SubMenu } = Menu;
   const header = [{ title: 'Invoices', description: `There are ${invoiceData.length} total invoices` }];
 
-  const handleShowDetails = async (invoice: IInvoice) => {
+  const handleShowDetails = async (action: string, invoice: IInvoice) => {
     await localForage.setItem(DRAFT_INVOICE_KEY, invoice);
-    window.location.replace('/invoice');
+
+    if (action === 'view') window.location.replace('/invoice');
+    else setEditInvoice(true);
   };
 
   const onCloseDrawer = async () => {
-    await localForage.removeItem(DRAFT_INVOICE_KEY);
+    updateInvoiceList();
     setEditInvoice(false);
-  };
-
-  const onOpenDrawer = async (invoice: IInvoice | undefined) => {
-    await localForage.setItem(DRAFT_INVOICE_KEY, invoice);
-
-    setEditInvoice(true);
   };
 
   const onAddNewInvoice = async () => {
     await localForage.setItem(DRAFT_INVOICE_KEY, DEFAULT_INVOICE);
 
     setEditInvoice(true);
+  };
+
+  const updateInvoiceList = async () => {
+    // check if there is invoice on localForage
+    const localData: any = await localforage.getItem(DRAFT_INVOICE_KEY);
+    const apiDataList = await getInvoices();
+
+    //replace api invoice with matching on in localforage
+    if (!isEmpty(localData)) {
+      let newList: IInvoice[] = [];
+      // if invoice is new and was only stored in localforage - add to list
+      apiDataList.map((apiData: IInvoice) => {
+        if (apiData.id === localData.id) {
+          apiData = localData;
+        }
+        newList.push(apiData);
+      });
+      setInvoiceData(newList);
+    } else setInvoiceData(apiDataList);
   };
 
   const onFilterInvoices = async (status: string) => {
@@ -73,7 +89,7 @@ const Invoices: React.FC<any> = () => {
   }, [themeContext.themeMode]);
 
   useEffect(() => {
-    getInvoices().then((result) => setInvoiceData(result));
+    updateInvoiceList();
   }, []);
 
   return (
@@ -86,7 +102,7 @@ const Invoices: React.FC<any> = () => {
         getContainer={false}
         style={{ position: 'absolute' }}
       >
-        <EditInvoice onCloseDrawer={onCloseDrawer} />
+        <EditInvoice key={nanoid()} onCloseDrawer={onCloseDrawer} />
       </StyledDrawer>
       <InvoiceWrapper>
         <List
@@ -133,10 +149,10 @@ const Invoices: React.FC<any> = () => {
                 </LineItemStatus>
                 <Menu style={{ width: 45 }} mode="vertical">
                   <SubMenu key="sub1">
-                    <Menu.Item key="1" onClick={() => handleShowDetails(invoice)}>
+                    <Menu.Item key="1" onClick={() => handleShowDetails('view', invoice)}>
                       View
                     </Menu.Item>
-                    <Menu.Item key="2" onClick={() => onOpenDrawer(invoice)}>
+                    <Menu.Item key="2" onClick={() => handleShowDetails('edit', invoice)}>
                       Edit
                     </Menu.Item>
                   </SubMenu>
@@ -148,17 +164,6 @@ const Invoices: React.FC<any> = () => {
           <EmptyState />
         )}
       </InvoiceWrapper>
-      )
-      {/* {showDetail && (
-        <InvoiceWrapper>
-          <div onClick={() => setShowDetail(false)}>
-            <Space>
-              <img src={ArrowLeft} /> <Text> Go Back</Text>
-            </Space>
-          </div>
-          <Invoice onOpenDrawer={onOpenDrawer} onCloseDrawer={onCloseDrawer} onMarkAsPaid={onMarkAsPaid} />
-        </InvoiceWrapper>
-      )} */}
     </>
   );
 };

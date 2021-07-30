@@ -1,51 +1,85 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Typography, Space } from 'antd';
 import { IInvoice } from '../../interfaces';
-import { PlusOutlined } from '@ant-design/icons';
-import { isEmpty } from 'lodash';
+import { isEmpty, isInteger, some } from 'lodash';
 import localForage from 'localforage';
 import Container from '../../components/Container';
 import StyledLabel from '../../components/Label';
 import DatePicker from '../../components/DatePicker';
 import Button2 from '../../components/Buttons/default2';
 import Button3 from '../../components/Buttons/default3';
-import NewItemButton from '../../components/Buttons/newItem';
-import DeleteIcon from '../../assets/icon-delete.svg';
-import StyleDeleteIcon from '../../components/DeleteIcon';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
 import { DEFAULT_INVOICE, DRAFT_INVOICE_KEY } from '../../constants';
 import { format } from 'date-fns';
 import localforage from 'localforage';
+import { openNotificationWithIcon } from '../../utils/funtions/notification';
+import { saveInvoice } from '../../utils/funtions/saveInvoice';
+import InvoiceItems from './invoiceItems';
 
 const EditInvoice: React.FC<any> = ({ ...props }) => {
   const [form] = Form.useForm();
   const [invoice, setInvoice] = useState<IInvoice>(DEFAULT_INVOICE);
-  const [mounted, setMounted] = useState(false);
-  //const [editAsDraft, setEditAsDraft] = useState(false);
   const { Title, Text } = Typography;
-  const items = invoice?.items;
 
-  const onFinish = (values: any) => {
-    console.log('Received values of form: ', values);
-    if (props.editAsDraft) {
-      return localForage.setItem(DRAFT_INVOICE_KEY, invoice);
+  const onFinish = async (values: any) => {
+    // validate fields
+    const validation = validateFields();
+
+    if (validation.result === 'success') {
+      // set status to pending
+      const finalInvoice = { ...invoice, status: 'pending' };
+      await saveInvoice(finalInvoice);
+
+      openNotificationWithIcon({ type: 'success', description: 'Invoice succesfully updated!!', message: 'Success' });
+      props.onCloseDrawer();
     }
   };
 
-  const validateFields = (rule: any, value: any, callback: CallableFunction) => {
-    // validate email address
-    //@ts-ignore
-    const _value = invoice[field];
-    console.log(rule, value);
-    if (isEmpty(_value)) {
-      callback('This value is required');
+  const onInvoiceItemChange = (event: React.ChangeEvent<any>, index: number) => {
+    const target = event.target.name;
+    let newTotal = 0;
+
+    if (isEmpty(invoice.items)) {
+      let item = { name: '', quantity: 0, price: 0, total: 0 };
+
+      // if change is on price or qty - update total
+      if (target === 'price') newTotal = item.quantity * Number(event.target.value);
+      if (target === 'quantity') newTotal = item.price * Number(event.target.value);
+
+      item = { ...item, [target]: event.target.value, total: newTotal };
+      setInvoice({ ...invoice, items: [item], total: newTotal });
     } else {
-      callback();
+      let item = invoice.items[index];
+
+      // if change is on price or qty - update total
+      if (target === 'price') newTotal = item.quantity * Number(event.target.value);
+      if (target === 'quantity') newTotal = item.price * Number(event.target.value);
+
+      item = { ...item, [target]: event.target.value, total: newTotal };
+      let updatedItems = invoice.items;
+      updatedItems[index] = item;
+
+      let invoiceTotal = 0;
+      updatedItems.map((x) => (invoiceTotal += x.total));
+      setInvoice({ ...invoice, items: updatedItems, total: invoiceTotal });
     }
   };
 
-  const onChangeAdress = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const validateFields = (): any => {
+    //if no fields are empty - return result success
+    if (!some(invoice, (x: any) => isEmpty(x) && !isInteger(x))) return { result: 'success' };
+
+    openNotificationWithIcon({
+      type: 'error',
+      description: 'All fields are required',
+      message: 'Error',
+    });
+
+    return { result: 'fail' };
+  };
+
+  const onChangeAdress = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const address = event.target.name.split('-');
 
     let updatedAddress: IInvoice['senderAddress'];
@@ -68,7 +102,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
     }
   };
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const state = { ...invoice, [event.target.name]: event.target.value };
     setInvoice(state);
   };
@@ -77,10 +111,15 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
     localforage.getItem(DRAFT_INVOICE_KEY).then((result: any) => {
       if (!isEmpty(result)) {
         setInvoice(result);
-        //setMounted(true);
       }
     });
-  }, [props]);
+  }, []);
+
+  const onSaveAsDraft = async () => {
+    await localForage.setItem(DRAFT_INVOICE_KEY, { ...invoice, status: 'draft' });
+    openNotificationWithIcon({ type: 'success', description: 'Invoice succesfully updated!!', message: 'Success' });
+    props.onCloseDrawer();
+  };
 
   const onPaymentTermChange = (terms: number) => {
     const _date = new Date(invoice.paymentDue);
@@ -106,7 +145,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
       <Form name="edit" onFinish={onFinish} form={form}>
         <StyledLabel>Bill From</StyledLabel>
         <>
-          <Form.Item name="senderAddress-street" rules={[{ validator: validateFields }]}>
+          <Form.Item>
             <label>Street Adress</label>
             <Input
               size="large"
@@ -118,7 +157,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
           </Form.Item>
           <Container>
             <Space>
-              <Form.Item name="senderAddress-city" rules={[{ validator: validateFields }]}>
+              <Form.Item>
                 <label>City</label>
                 <Input
                   name="senderAddress-city"
@@ -128,7 +167,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onChangeAdress}
                 />
               </Form.Item>
-              <Form.Item name="senderAddress-city" rules={[{ validator: validateFields }]}>
+              <Form.Item>
                 <label>Postal Code</label>
                 <Input
                   name="senderAddress-postCode"
@@ -138,7 +177,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onChangeAdress}
                 />
               </Form.Item>
-              <Form.Item name="senderAddress-country" rules={[{ validator: validateFields }]}>
+              <Form.Item>
                 <label>Country</label>
                 <Input
                   name="senderAddress-country"
@@ -154,7 +193,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
 
         <>
           <StyledLabel>Bill To</StyledLabel>
-          <Form.Item name="clientName" rules={[{ validator: validateFields }]}>
+          <Form.Item>
             <label>{"Client's Name"}</label>
             <Input
               size="large"
@@ -164,7 +203,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
               onChange={onChange}
             />
           </Form.Item>
-          <Form.Item name="clientEmail" rules={[{ validator: validateFields }]}>
+          <Form.Item>
             <label>{"Client's Email"}</label>
             <Input
               size="large"
@@ -175,7 +214,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
             />
           </Form.Item>
 
-          <Form.Item name="clientAddress-street" rules={[{ validator: validateFields }]}>
+          <Form.Item>
             <label>Street Address</label>
             <Input
               size="large"
@@ -187,7 +226,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
           </Form.Item>
           <Container>
             <Space>
-              <Form.Item name="clientAddress-city" rules={[{ validator: validateFields }]}>
+              <Form.Item>
                 <label>City</label>
                 <Input
                   name="clientAddress-city"
@@ -197,7 +236,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onChangeAdress}
                 />
               </Form.Item>
-              <Form.Item name="clientAddress-postCode" rules={[{ validator: validateFields }]}>
+              <Form.Item>
                 <label>Postal Code</label>
                 <Input
                   name="clientAddress-postCode"
@@ -207,7 +246,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onChangeAdress}
                 />
               </Form.Item>
-              <Form.Item name="clientAddress-country" rules={[{ validator: validateFields }]}>
+              <Form.Item>
                 <label>Country</label>
                 <Input
                   name="clientAddress-country"
@@ -223,7 +262,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
           <br />
           <Container>
             <Space>
-              <Form.Item name="createdAt" rules={[{ validator: validateFields }]}>
+              <Form.Item>
                 <label>Invoice Date</label>
                 <DatePicker
                   size="large"
@@ -233,7 +272,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onDateChange}
                 />
               </Form.Item>
-              <Form.Item name="paymentTerms" rules={[{ validator: validateFields }]}>
+              <Form.Item>
                 <label>Payment Terms</label>
                 <Select
                   size="large"
@@ -250,84 +289,29 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
               </Form.Item>
             </Space>
           </Container>
-          <Form.Item rules={[{ validator: validateFields }]}>
+          <Form.Item>
             <label>Project Description</label>
-            <Input size="large" placeholder="Enter description" name="description" value={invoice?.description} />
+            <Input
+              size="large"
+              placeholder="Enter description"
+              name="description"
+              value={invoice?.description}
+              onChange={onChange}
+            />
           </Form.Item>
 
           <>
             <h3>Item List</h3>
             <br />
           </>
-          <Form.List name="items">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map((field) => (
-                  <Container key={field.key}>
-                    <Space align="baseline">
-                      <Form.Item
-                        required
-                        tooltip="This is a required field"
-                        name="item-name"
-                        fieldKey="item-name"
-                        shouldUpdate={() => true}
-                      >
-                        <label>Item Name</label>
-                        <Input size="large" placeholder="Enter name" value={field?.name} />
-                      </Form.Item>
-                      <Form.Item
-                        required
-                        tooltip="This is a required field"
-                        // name={[field.name, 'quantity']}
-                        // fieldKey={[field.fieldKey, 'quantity']}
-                        name="item-quantity"
-                        fieldKey="item-name"
-                        shouldUpdate={() => true}
-                      >
-                        <label>Qty.</label>
-                        <Input size="large" placeholder="Enter qty." value={''} />
-                      </Form.Item>
-                      <Form.Item
-                        required
-                        tooltip="This is a required field"
-                        // name={[field.name, 'price']}
-                        // fieldKey={[field.fieldKey, 'price']}
-                        name="item-price"
-                        fieldKey="item-price"
-                        shouldUpdate={() => true}
-                      >
-                        <label>Price</label>
-                        <Input size="large" placeholder="Enter price" value={''} />
-                      </Form.Item>
-                      <Form.Item
-                        required
-                        tooltip="This is a required field"
-                        //name={[field.name, 'total']}
-                        //fieldKey={[field.fieldKey, 'total']}
-                        name="item-total"
-                        fieldKey="item-total"
-                        shouldUpdate={() => true}
-                      >
-                        <label>Total</label>
-                        <Input size="large" placeholder="Enter total" value={''} />
-                      </Form.Item>
 
-                      <StyleDeleteIcon src={DeleteIcon} onClick={() => remove(field.name)} />
-                    </Space>
-                  </Container>
-                ))}
-                <Form.Item>
-                  <NewItemButton onClick={() => add()} block icon={<PlusOutlined />}>
-                    Add New Item
-                  </NewItemButton>
-                </Form.Item>
-              </>
-            )}
-          </Form.List>
+          <InvoiceItems invoice={invoice} onInvoiceItemChange={onInvoiceItemChange} />
+
           <div style={{ textAlign: 'right' }}>
             <Space>
               <Button3 title="Cancel" onClick={() => props.onCloseDrawer()} />
-              <Button2 title="Save Changes" />
+              <Button2 title="Save As Draft" onClick={onSaveAsDraft} />
+              <Button2 title="Save $ Send" type="submit" />
             </Space>
           </div>
         </>
