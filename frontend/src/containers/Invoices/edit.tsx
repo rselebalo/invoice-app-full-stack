@@ -266,6 +266,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                 <label>Invoice Date</label>
                 <DatePicker
                   size="large"
+                  style={{ width: '100%' }}
                   name="createdAt"
                   placeholder="Select date"
                   value={invoice ? new Date(invoice?.createdAt) : new Date()}
