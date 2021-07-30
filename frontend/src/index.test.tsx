@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './navigation';
 
-test('renders learn react link', () => {
+test('renders the invoices page', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const tileElement = screen.getByText(/Invoices/i);
+  expect(tileElement).toBeInTheDocument();
 });

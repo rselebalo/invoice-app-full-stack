@@ -1,12 +1,12 @@
 # Invoice App Project
 
-REST API written in NodeJS, TypeScript, Express, MongoDb that produces and saves invoice data
+REACTJS APP create from create-react-app with typescript template
 
 ---
 
 ## Prerequisites
 
-1. Node v12.x or above
+1. Needs the backend service to run
 2. create .env and get variables from .env.example in this repo
 
 ## Getting Started
@@ -16,7 +16,7 @@ These instructions will get you a copy of the project up and running on your loc
 ## Getting the source code
 
     $ git clone http://tfg-labs-hfcuqm@git.codesubmit.io/tfg-labs/full-stack-invoice-app-btpzci
-    $ cd backend
+    $ cd frontend
     $ yarn install
 
 ## Configure app
@@ -27,20 +27,13 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Endpoints
 
-- /api/invoices (GET)
-- /api/invoice (POST, GET)
-
 ## Running the project
 
-    $ yarn start:dev
+    $ yarn start
 
 ## Simple build for production
 
     $ yarn run build
-
-## Production deployment
-
-    $ docker-compose build --no-cache && docker-compose up -d --force-recreate
 
 ## Author
 
