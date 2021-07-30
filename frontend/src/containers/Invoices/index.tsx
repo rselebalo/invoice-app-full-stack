@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { List, Space, Typography, Badge, Drawer, Menu } from 'antd';
+import { List, Space, Typography, Badge, notification, Menu, Popover } from 'antd';
 import Button from '../../components/Buttons/default1';
 import Container from '../../components/Container';
 import ArrowDown from '../../assets/icon-arrow-down.svg';
@@ -15,6 +15,10 @@ import EditInvoice from './edit';
 import StyledDrawer from '../../components/Drawer';
 import InvoiceWrapper from '../../components/InvoiceWrapper';
 import { getInvoices } from '../../utils/funtions/getInvoices';
+import { saveInvoice } from '../../utils/funtions/saveInvoice';
+import { isEmpty } from 'lodash';
+import EmptyState from '../../components/EmptyState';
+import { getInvoicesByStatus } from '../../utils/funtions/getInvoicesByStatus';
 
 const Invoices: React.FC<any> = () => {
   const [showDetail, setShowDetail] = useState(false);
@@ -42,6 +46,44 @@ const Invoices: React.FC<any> = () => {
     setEditInvoice(true);
   };
 
+  const onMarkAsPaid = async () => {
+    //@ts-ignore
+    const result = await saveInvoice({ ...selectedInvoice, status: 'paid' });
+
+    if (result === 'success') {
+      openNotificationWithIcon('Invoice succesfully updated!!');
+      setShowDetail(false);
+      const updated = await getInvoices();
+      setInvoiceData(updated);
+    }
+  };
+
+  const openNotificationWithIcon = (message: string) => {
+    notification['success']({
+      message: 'Success',
+      description: message,
+    });
+  };
+
+  const onFilterInvoices = async (status: string) => {
+    const resullt = await getInvoicesByStatus(status);
+    setInvoiceData(resullt);
+  };
+
+  const content = (
+    <Menu style={{ width: 146 }} mode="inline" title="Filter by status">
+      <Menu.Item key="1" onClick={() => onFilterInvoices('pending')}>
+        Pending
+      </Menu.Item>
+      <Menu.Item key="2" onClick={() => onFilterInvoices('paid')}>
+        Paid
+      </Menu.Item>
+      <Menu.Item key="3" onClick={() => onFilterInvoices('draft')}>
+        Draft
+      </Menu.Item>
+    </Menu>
+  );
+
   useEffect(() => {
     setSelectedTheme(themeContext.themeMode);
   }, [themeContext.themeMode]);
@@ -54,7 +96,6 @@ const Invoices: React.FC<any> = () => {
   return (
     <>
       <StyledDrawer
-        //title={isEmpty(selectedInvoice) ? `Create Invoice` : `Edit #${selectedInvoice?.id}`}
         placement="left"
         closable={false}
         onClose={onCloseDrawer}
@@ -77,7 +118,10 @@ const Invoices: React.FC<any> = () => {
                   <Container>
                     <Space>
                       <Title level={5}>
-                        Filter by status <img alt="down" src={ArrowDown} />
+                        Filter by status{' '}
+                        <Popover placement="bottom" content={content} trigger="click">
+                          <img alt="down" src={ArrowDown} />
+                        </Popover>
                       </Title>
                       <Button title="New Invoice" onClick={() => onOpenDrawer(undefined)} />
                     </Space>
@@ -92,34 +136,41 @@ const Invoices: React.FC<any> = () => {
             )}
           />
 
-          <div>
-            {invoiceData.map((invoice: IInvoice) => (
-              <InvoiceLineItem key={nanoid()}>
-                <Text>#{invoice.id}</Text>
-                <Text>Due {invoice.paymentDue}</Text>
-                <Text>{invoice.clientName}</Text>
-                <Text>£{invoice.total}</Text>
-                <LineItemStatus status={invoice.status}>
-                  <Badge
-                    status={invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'warning' : 'error'}
-                    text={invoice.status}
-                  />
-                </LineItemStatus>
-                <Menu style={{ width: 45 }} mode="vertical">
-                  <SubMenu key="sub1">
-                    <Menu.Item key="1" onClick={() => handleShowDetails(invoice)}>
-                      View
-                    </Menu.Item>
-                    <Menu.Item key="2" onClick={() => onOpenDrawer(invoice)}>
-                      Edit
-                    </Menu.Item>
-                  </SubMenu>
-                </Menu>
-              </InvoiceLineItem>
-            ))}
-          </div>
+          {!isEmpty(invoiceData) ? (
+            <div>
+              {invoiceData.map((invoice: IInvoice) => (
+                <InvoiceLineItem key={nanoid()}>
+                  <Text>#{invoice.id}</Text>
+                  <Text>Due {invoice.paymentDue}</Text>
+                  <Text>{invoice.clientName}</Text>
+                  <Text>£{invoice.total}</Text>
+                  <LineItemStatus status={invoice.status}>
+                    <Badge
+                      status={
+                        invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'warning' : 'error'
+                      }
+                      text={invoice.status}
+                    />
+                  </LineItemStatus>
+                  <Menu style={{ width: 45 }} mode="vertical">
+                    <SubMenu key="sub1">
+                      <Menu.Item key="1" onClick={() => handleShowDetails(invoice)}>
+                        View
+                      </Menu.Item>
+                      <Menu.Item key="2" onClick={() => onOpenDrawer(invoice)}>
+                        Edit
+                      </Menu.Item>
+                    </SubMenu>
+                  </Menu>
+                </InvoiceLineItem>
+              ))}
+            </div>
+          ) : (
+            <EmptyState />
+          )}
         </InvoiceWrapper>
       )}
+
       {showDetail && (
         <InvoiceWrapper>
           <div onClick={() => setShowDetail(false)}>
@@ -127,7 +178,12 @@ const Invoices: React.FC<any> = () => {
               <img src={ArrowLeft} /> <Text> Go Back</Text>
             </Space>
           </div>
-          <Invoice selected={selectedInvoice} onOpenDrawer={onOpenDrawer} onCloseDrawer={onCloseDrawer} />
+          <Invoice
+            selected={selectedInvoice}
+            onOpenDrawer={onOpenDrawer}
+            onCloseDrawer={onCloseDrawer}
+            onMarkAsPaid={onMarkAsPaid}
+          />
         </InvoiceWrapper>
       )}
     </>

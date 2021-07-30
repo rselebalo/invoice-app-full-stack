@@ -1,23 +1,19 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState } from 'react';
 import { Space, Typography, Badge } from 'antd';
 import Button2 from '../../components/Buttons/default2';
 import Button5 from '../../components/Buttons/default5';
 import Button3 from '../../components/Buttons/default3';
 import Container from '../../components/Container';
 import Card from '../../components/Card';
-import ArrowLeft from '../../assets/icon-arrow-left.svg';
 import { IInvoice } from '../../interfaces';
 import { nanoid } from 'nanoid';
 import InvoiceLineItem from '../../components/InvoiceLineItem';
 import LineItemStatus from '../../components/InvoiceLineItem/status';
 import InformationPiece from '../../components/Card/containter';
-import { ThemeContext } from '../../contexts';
 import StyledTable from '../../components/Table';
 
 const Invoice: React.FC<any> = ({ ...props }) => {
   const { Text, Title } = Typography;
-  //const themeContext = useContext(ThemeContext);
-  //const [selectedTheme, setSelectedTheme] = useState(themeContext.themeMode);
   const [invoice, setInvoice] = useState<IInvoice>(props.selected);
   const footer = () => (
     <Container>
@@ -43,10 +39,6 @@ const Invoice: React.FC<any> = ({ ...props }) => {
     },
   ];
 
-  // useEffect(() => {
-  //   setSelectedTheme(themeContext.themeMode);
-  // }, [themeContext.themeMode]);
-
   return (
     <>
       <InvoiceLineItem key={nanoid()}>
@@ -66,7 +58,7 @@ const Invoice: React.FC<any> = ({ ...props }) => {
           <Space>
             <Button3 title="Edit" onClick={() => props.onOpenDrawer(invoice)} />
             <Button5 title="Delete" />
-            <Button2 title="Mark as Paid" />
+            <Button2 title="Mark as Paid" onClick={() => props.onMarkAsPaid()} />
           </Space>
         </Container>
       </InvoiceLineItem>

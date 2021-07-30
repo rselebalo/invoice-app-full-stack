@@ -8,7 +8,7 @@ const StyledButton = styled(Button)`
   text-align: center;
   border-radius: 24px;
   font-weight: 700;
-  padding: 10px;
+  padding: 5px;
 
   :hover {
     color: ${(props) => props.theme.button1.default.color};

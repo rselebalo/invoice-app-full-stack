@@ -12,7 +12,7 @@ const StyledButton = styled(Button)`
   justify-items: center;
   border-radius: 24px;
   font-weight: 700;
-  padding: 10px 30px 10px 10px;
+  padding: 5px 30px 10px 10px;
 
   :hover {
     color: ${(props) => props.theme.button1.default.color};

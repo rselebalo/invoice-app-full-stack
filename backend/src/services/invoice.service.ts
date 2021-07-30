@@ -16,6 +16,19 @@ const getInvoices = async (): Promise<IInvoice[]> => {
     }
 };
 
+const getInvoicesByStatus = async (status: string): Promise<IInvoice[]> => {
+    try {
+        // establish db connection
+        await connectToDatabase();
+
+        const invoices: IInvoice[] = await Invoice.find({ status});
+
+        return Promise.resolve(invoices);
+    } catch (error) {
+        return Promise.reject(error);
+    }
+};
+
 const getInvoice = async (id: string): Promise<IInvoice | null> => {
     try {
         // establish db connection
@@ -78,4 +91,4 @@ const generateInvoiceId = async() => {
         return id;
 };
 
-export { getInvoices, getInvoice, setInvoice };
+export { getInvoices, getInvoice, getInvoicesByStatus, setInvoice };

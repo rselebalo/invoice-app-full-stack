@@ -1,15 +1,14 @@
 import axios from 'axios';
 import { IInvoice } from '../../interfaces';
 
-export const saveInvoice = async (invoice: IInvoice): Promise<string> => {
+export const getInvoicesByStatus = async (status: string): Promise<IInvoice[]> => {
   try {
     const result = await axios.request({
-      url: `${process.env.REACT_APP_BASE_URL}/invoice`,
-      method: 'POST',
+      url: `${process.env.REACT_APP_BASE_URL}/invoices?status=${status}`,
+      method: 'GET',
       headers: {
         contentType: 'application/json',
       },
-      data: invoice,
     });
     return Promise.resolve(result.data);
   } catch (error) {

@@ -8,7 +8,7 @@ const StyledButton = styled(Button)`
   text-align: center;
   border-radius: 24px;
   font-weight: 700;
-  padding: 10px;
+  padding: 5px;
 
   :hover {
     color: ${(props) => props.theme.button2.default.color};
@@ -30,7 +30,19 @@ const StyledButton = styled(Button)`
   }
 `;
 
-const DefaultButton = ({ title }: { title: string }) => {
-  return <StyledButton htmlType="submit">{title}</StyledButton>;
+const DefaultButton = ({
+  title,
+  type,
+  onClick,
+}: {
+  title: string;
+  type?: 'button' | 'submit' | 'reset';
+  onClick?: React.EventHandler<any>;
+}) => {
+  return (
+    <StyledButton htmlType={type || 'button'} onClick={onClick}>
+      {title}
+    </StyledButton>
+  );
 };
 export default DefaultButton;
