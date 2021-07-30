@@ -14,8 +14,9 @@ import DeleteIcon from '../../assets/icon-delete.svg';
 import StyleDeleteIcon from '../../components/DeleteIcon';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
-import { DEFAULT_INVOICE } from '../../constants';
+import { DEFAULT_INVOICE, DRAFT_INVOICE_KEY } from '../../constants';
 import { format } from 'date-fns';
+import localforage from 'localforage';
 
 const EditInvoice: React.FC<any> = ({ ...props }) => {
   const [form] = Form.useForm();
@@ -28,7 +29,19 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
   const onFinish = (values: any) => {
     console.log('Received values of form: ', values);
     if (props.editAsDraft) {
-      return localForage.setItem('daftIvoice', invoice);
+      return localForage.setItem(DRAFT_INVOICE_KEY, invoice);
+    }
+  };
+
+  const validateFields = (rule: any, value: any, callback: CallableFunction) => {
+    // validate email address
+    //@ts-ignore
+    const _value = invoice[field];
+    console.log(rule, value);
+    if (isEmpty(_value)) {
+      callback('This value is required');
+    } else {
+      callback();
     }
   };
 
@@ -61,10 +74,12 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
   };
 
   useEffect(() => {
-    if (props.selectedInvoice && !mounted) {
-      setInvoice(props.selectedInvoice);
-      setMounted(true);
-    }
+    localforage.getItem(DRAFT_INVOICE_KEY).then((result: any) => {
+      if (!isEmpty(result)) {
+        setInvoice(result);
+        //setMounted(true);
+      }
+    });
   }, [props]);
 
   const onPaymentTermChange = (terms: number) => {
@@ -91,7 +106,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
       <Form name="edit" onFinish={onFinish} form={form}>
         <StyledLabel>Bill From</StyledLabel>
         <>
-          <Form.Item required tooltip="This is a required field">
+          <Form.Item name="senderAddress-street" rules={[{ validator: validateFields }]}>
             <label>Street Adress</label>
             <Input
               size="large"
@@ -103,7 +118,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
           </Form.Item>
           <Container>
             <Space>
-              <Form.Item required tooltip="This is a required field">
+              <Form.Item name="senderAddress-city" rules={[{ validator: validateFields }]}>
                 <label>City</label>
                 <Input
                   name="senderAddress-city"
@@ -113,7 +128,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onChangeAdress}
                 />
               </Form.Item>
-              <Form.Item required tooltip="This is a required field">
+              <Form.Item name="senderAddress-city" rules={[{ validator: validateFields }]}>
                 <label>Postal Code</label>
                 <Input
                   name="senderAddress-postCode"
@@ -123,7 +138,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onChangeAdress}
                 />
               </Form.Item>
-              <Form.Item required tooltip="This is a required field">
+              <Form.Item name="senderAddress-country" rules={[{ validator: validateFields }]}>
                 <label>Country</label>
                 <Input
                   name="senderAddress-country"
@@ -139,7 +154,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
 
         <>
           <StyledLabel>Bill To</StyledLabel>
-          <Form.Item required name="clientName">
+          <Form.Item name="clientName" rules={[{ validator: validateFields }]}>
             <label>{"Client's Name"}</label>
             <Input
               size="large"
@@ -149,19 +164,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
               onChange={onChange}
             />
           </Form.Item>
-          <Form.Item
-            name="clientEmail"
-            rules={[
-              {
-                type: 'email',
-                message: 'The input is not valid E-mail!',
-              },
-              {
-                required: true,
-                message: 'Please input your E-mail!',
-              },
-            ]}
-          >
+          <Form.Item name="clientEmail" rules={[{ validator: validateFields }]}>
             <label>{"Client's Email"}</label>
             <Input
               size="large"
@@ -172,7 +175,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
             />
           </Form.Item>
 
-          <Form.Item required name="clientAddress-street">
+          <Form.Item name="clientAddress-street" rules={[{ validator: validateFields }]}>
             <label>Street Address</label>
             <Input
               size="large"
@@ -184,7 +187,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
           </Form.Item>
           <Container>
             <Space>
-              <Form.Item required tooltip="This is a required field" name="clientAddress-city">
+              <Form.Item name="clientAddress-city" rules={[{ validator: validateFields }]}>
                 <label>City</label>
                 <Input
                   name="clientAddress-city"
@@ -194,13 +197,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onChangeAdress}
                 />
               </Form.Item>
-              <Form.Item
-                required
-                tooltip="This is a required field"
-                name="clientAddress-postCode"
-                validateStatus="error"
-                help="Should be combination of numbers & alphabets"
-              >
+              <Form.Item name="clientAddress-postCode" rules={[{ validator: validateFields }]}>
                 <label>Postal Code</label>
                 <Input
                   name="clientAddress-postCode"
@@ -210,7 +207,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
                   onChange={onChangeAdress}
                 />
               </Form.Item>
-              <Form.Item required tooltip="This is a required field" name="clientAddress-country">
+              <Form.Item name="clientAddress-country" rules={[{ validator: validateFields }]}>
                 <label>Country</label>
                 <Input
                   name="clientAddress-country"
@@ -226,16 +223,17 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
           <br />
           <Container>
             <Space>
-              <Form.Item required tooltip="This is a required field" name="createdAt">
+              <Form.Item name="createdAt" rules={[{ validator: validateFields }]}>
                 <label>Invoice Date</label>
                 <DatePicker
                   size="large"
+                  name="createdAt"
                   placeholder="Select date"
                   value={invoice ? new Date(invoice?.createdAt) : new Date()}
                   onChange={onDateChange}
                 />
               </Form.Item>
-              <Form.Item required tooltip="This is a required field" name="paymentTerms">
+              <Form.Item name="paymentTerms" rules={[{ validator: validateFields }]}>
                 <label>Payment Terms</label>
                 <Select
                   size="large"
@@ -252,7 +250,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
               </Form.Item>
             </Space>
           </Container>
-          <Form.Item required tooltip="This is a required field" name="description">
+          <Form.Item rules={[{ validator: validateFields }]}>
             <label>Project Description</label>
             <Input size="large" placeholder="Enter description" name="description" value={invoice?.description} />
           </Form.Item>

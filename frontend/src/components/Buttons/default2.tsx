@@ -34,13 +34,15 @@ const DefaultButton = ({
   title,
   type,
   onClick,
+  disabled,
 }: {
   title: string;
   type?: 'button' | 'submit' | 'reset';
   onClick?: React.EventHandler<any>;
+  disabled?: boolean;
 }) => {
   return (
-    <StyledButton htmlType={type || 'button'} onClick={onClick}>
+    <StyledButton htmlType={type || 'button'} onClick={onClick} disabled={disabled}>
       {title}
     </StyledButton>
   );
