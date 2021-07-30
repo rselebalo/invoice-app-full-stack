@@ -1,5 +1,5 @@
 export interface IInvoice {
-  id: string;
+  id?: string;
   createdAt: string;
   paymentDue: string;
   description: string;

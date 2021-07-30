@@ -16,7 +16,7 @@ import { getInvoices } from '../../utils/funtions/getInvoices';
 import { isEmpty } from 'lodash';
 import EmptyState from '../../components/EmptyState';
 import { getInvoicesByStatus } from '../../utils/funtions/getInvoicesByStatus';
-import { DEFAULT_INVOICE, DRAFT_INVOICE_KEY } from '../../constants';
+import { DEFAULT_INVOICE, DRAFT_INVOICE_KEY, TEMP_ID } from '../../constants';
 import localforage from 'localforage';
 
 const Invoices: React.FC<any> = () => {
@@ -36,7 +36,7 @@ const Invoices: React.FC<any> = () => {
   };
 
   const onCloseDrawer = async () => {
-    updateInvoiceList();
+    await updateInvoiceList();
     setEditInvoice(false);
   };
 
@@ -54,11 +54,15 @@ const Invoices: React.FC<any> = () => {
     //replace api invoice with matching on in localforage
     if (!isEmpty(localData)) {
       let newList: IInvoice[] = [];
+
       // if invoice is new and was only stored in localforage - add to list
+      if (localData.id === TEMP_ID) newList.push(localData);
+
       apiDataList.map((apiData: IInvoice) => {
         if (apiData.id === localData.id) {
           apiData = localData;
         }
+
         newList.push(apiData);
       });
       setInvoiceData(newList);

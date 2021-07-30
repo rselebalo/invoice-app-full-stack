@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Typography, Space } from 'antd';
 import { IInvoice } from '../../interfaces';
-import { isEmpty, isInteger, some } from 'lodash';
+import { isEmpty, isNumber, some } from 'lodash';
 import localForage from 'localforage';
 import Container from '../../components/Container';
 import StyledLabel from '../../components/Label';
@@ -10,7 +10,7 @@ import Button2 from '../../components/Buttons/default2';
 import Button3 from '../../components/Buttons/default3';
 import Input from '../../components/Input';
 import Select from '../../components/Select';
-import { DEFAULT_INVOICE, DRAFT_INVOICE_KEY } from '../../constants';
+import { DEFAULT_INVOICE, DRAFT_INVOICE_KEY, TEMP_ID } from '../../constants';
 import { format } from 'date-fns';
 import localforage from 'localforage';
 import { openNotificationWithIcon } from '../../utils/funtions/notification';
@@ -29,8 +29,11 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
     if (validation.result === 'success') {
       // set status to pending
       const finalInvoice = { ...invoice, status: 'pending' };
+      if (invoice.id === TEMP_ID) delete finalInvoice.id;
       await saveInvoice(finalInvoice);
 
+      //delete local version
+      await localforage.removeItem(DRAFT_INVOICE_KEY);
       openNotificationWithIcon({ type: 'success', description: 'Invoice succesfully updated!!', message: 'Success' });
       props.onCloseDrawer();
     }
@@ -68,7 +71,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
 
   const validateFields = (): any => {
     //if no fields are empty - return result success
-    if (!some(invoice, (x: any) => isEmpty(x) && !isInteger(x))) return { result: 'success' };
+    if (!some(invoice, (x: any) => isEmpty(x) && !isNumber(x))) return { result: 'success' };
 
     openNotificationWithIcon({
       type: 'error',
@@ -116,7 +119,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
   }, []);
 
   const onSaveAsDraft = async () => {
-    await localForage.setItem(DRAFT_INVOICE_KEY, { ...invoice, status: 'draft' });
+    await localForage.setItem(DRAFT_INVOICE_KEY, { ...invoice, id: TEMP_ID, status: 'draft' });
     openNotificationWithIcon({ type: 'success', description: 'Invoice succesfully updated!!', message: 'Success' });
     props.onCloseDrawer();
   };
@@ -312,7 +315,7 @@ const EditInvoice: React.FC<any> = ({ ...props }) => {
             <Space>
               <Button3 title="Cancel" onClick={() => props.onCloseDrawer()} />
               <Button2 title="Save As Draft" onClick={onSaveAsDraft} />
-              <Button2 title="Save $ Send" type="submit" />
+              <Button2 title="Save & Send" type="submit" />
             </Space>
           </div>
         </>

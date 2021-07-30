@@ -2,6 +2,7 @@ import { format } from 'date-fns';
 import { IInvoice } from '../interfaces';
 
 export const DRAFT_INVOICE_KEY = 'draftInvoice';
+export const TEMP_ID = 'TT0001';
 export const DEFAULT_INVOICE: IInvoice = {
   id: '',
   createdAt: format(new Date(), 'yyyy-MM-dd'),
